@@ -33,7 +33,7 @@ class Draw:
         self.output_layer = self.layers.get("output")
         for k, neuron in enumerate(self.neural_network.output_layer.neurons):
             self.output_layer.draw_neuron(neuron)
-
+        self.layers.adjust_neurons()
         self.layers.connect_neurons()
 
     class Layers:
@@ -55,6 +55,7 @@ class Draw:
                 self.canvas = canvas
                 self.neuron_colors = "#" + "".join([random.choice('0123456789ABCDEF') for j in range(6)])
                 self.neurons = {}
+                self.object_on_layer = []
                 self._x_pointer = initial_x
                 self.y_pointer = 75
 
@@ -72,6 +73,13 @@ class Draw:
                                                               font=("Purisa", 12))
                 self.y_pointer = y1 + self.radius
                 self.neurons.update({neuron_drew: neuron})
+                self.object_on_layer.append(neuron_drew)
+                self.object_on_layer.append(neuron_name)
+                self.object_on_layer.append(neuron_sigma)
+
+            def move_objects(self, y, x=0):
+                for item in self.object_on_layer:
+                    self.canvas.canvas.move(item, x, y)
 
             @property
             def x_pointer(self):
@@ -98,11 +106,11 @@ class Draw:
                                         self.draggable_canvas.canvas.bbox(next_neuron[0])[1] + self.radius / 2))
                         weight = self.draggable_canvas.canvas.create_text(
                             neuron_coords[0] + (neuron_connected_[1][0] - neuron_coords[0]) / 2,
-                            neuron_coords[1] + (neuron_connected_[1][1] - neuron_coords[1]) / 2 + 10,
+                            neuron_coords[1] + (neuron_connected_[1][1] - neuron_coords[1]) / 2 + 15,
                             text=neuron_connected_[0],
                             font=("Purisa", 12))
-                        deltaY = abs(neuron_coords[1] - neuron_connected_[1][1])
-                        deltaX = abs(neuron_connected_[1][0] - neuron_coords[0])
+                        deltaY = (neuron_coords[1] - neuron_connected_[1][1])
+                        deltaX = (neuron_connected_[1][0] - neuron_coords[0])
                         angle = (math.atan2(deltaY, deltaX))
                         x_offset = (self.radius * math.cos(angle)) / 2
                         y_offset = (self.radius * math.sin(angle)) / 2
@@ -111,6 +119,21 @@ class Draw:
                                                                  neuron_connected_[1][0] - x_offset,
                                                                  neuron_connected_[1][1] + y_offset,
                                                                  arrow=tk.LAST)
+
+        def adjust_neurons(self):
+            max_y = 0
+            for k, layer in enumerate(self.layers):
+                for neuron_info in layer.neurons.items():
+                    if self.draggable_canvas.canvas.bbox(neuron_info[0])[3] > max_y:
+                        max_y = self.draggable_canvas.canvas.bbox(neuron_info[0])[3]
+            # print(max_y)
+            for k, layer in enumerate(self.layers):
+                max_y_for_this_layer = 0
+                for neuron_info in layer.neurons.items():
+                    if self.draggable_canvas.canvas.bbox(neuron_info[0])[3] > max_y_for_this_layer:
+                        max_y_for_this_layer = self.draggable_canvas.canvas.bbox(neuron_info[0])[3]
+                # print(max_y - max_y_for_this_layer)
+                layer.move_objects((max_y - max_y_for_this_layer) / 2)
 
     def go(self):
         self.m_canvas.set_scrollregion(*self.m_canvas.get_more_distant_points())

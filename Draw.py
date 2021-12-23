@@ -1,3 +1,4 @@
+import math
 import random
 
 import Neural_Network
@@ -24,7 +25,7 @@ class Draw:
         for j, hidden_layer in enumerate(self.neural_network.hidden_layers):
             self.layers.add(hidden_layer.name)
             self.hidden_layer = self.layers.get(hidden_layer.name)
-            #print(f"Hidden Layer: {hidden_layer.name}")
+            # print(f"Hidden Layer: {hidden_layer.name}")
             for k, neuron in enumerate(hidden_layer.neurons):
                 self.hidden_layer.draw_neuron(neuron)
 
@@ -90,7 +91,6 @@ class Draw:
                         neuron_connected_ = []
                         for next_layer in self.layers[k + 1:]:
                             for next_neuron in next_layer.neurons.items():
-
                                 if neuron_connected.name == next_neuron[1].name:
                                     neuron_connected_.append(neuron_connected.input.get(neuron_info[1].name)[1])
                                     neuron_connected_.append((
@@ -101,8 +101,15 @@ class Draw:
                             neuron_coords[1] + (neuron_connected_[1][1] - neuron_coords[1]) / 2 + 10,
                             text=neuron_connected_[0],
                             font=("Purisa", 12))
-                        self.draggable_canvas.canvas.create_line(*neuron_coords,
-                                                                 *neuron_connected_[1],
+                        deltaY = abs(neuron_coords[1] - neuron_connected_[1][1])
+                        deltaX = abs(neuron_connected_[1][0] - neuron_coords[0])
+                        angle = (math.atan2(deltaY, deltaX))
+                        x_offset = (self.radius * math.cos(angle)) / 2
+                        y_offset = (self.radius * math.sin(angle)) / 2
+                        self.draggable_canvas.canvas.create_line(neuron_coords[0] + x_offset,
+                                                                 neuron_coords[1] - y_offset,
+                                                                 neuron_connected_[1][0] - x_offset,
+                                                                 neuron_connected_[1][1] + y_offset,
                                                                  arrow=tk.LAST)
 
     def go(self):

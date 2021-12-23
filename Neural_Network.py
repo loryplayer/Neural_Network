@@ -1,7 +1,7 @@
 from __future__ import annotations
+from Draw import Draw
 
 import math
-
 
 class Neural_network:
     def __init__(self):
@@ -96,3 +96,25 @@ class Neural_network:
         for k, neuron in enumerate(self.output_layer.neurons):
             print(
                 f"{'|' if k < len(self.output_layer.neurons) - 1 else chr(92)}->Name: {neuron.name}; Sigma: {neuron.sigma}")
+
+    def show_network(self):
+        draw = Draw(self)
+        draw.go()
+        '''
+        print("Input layer:")
+        for k, neuron in enumerate(self.input_layer.neurons):
+
+        print("\n")
+        for hidden_layer in self.hidden_layers:
+            print(f"Hidden Layer: {hidden_layer.name}")
+            for k, neuron in enumerate(hidden_layer.neurons):
+                print(
+                    f"{'|' if k < len(hidden_layer.neurons) - 1 else chr(92)}->Name: {neuron.name}; Sigma: {neuron.sigma}")
+        print("\n")
+        print(f"Output Layer:")
+        for k, neuron in enumerate(self.output_layer.neurons):
+            print(
+                f"{'|' if k < len(self.output_layer.neurons) - 1 else chr(92)}->Name: {neuron.name}; Sigma: {neuron.sigma}")
+        m_canvas.set_scrollregion(*m_canvas.get_more_distant_points())
+        root.mainloop()
+        '''

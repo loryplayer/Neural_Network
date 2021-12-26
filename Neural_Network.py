@@ -29,7 +29,6 @@ class Neural_network:
                 self.neurons_connected.append(neuron)
 
             def sum(self) -> float:
-                # print(self.input.inputs)
                 summation = self._bias[0] * self._bias[1]
                 for k, a in self.input.inputs.items():
                     summation += a[0] * a[1]
@@ -58,13 +57,13 @@ class Neural_network:
                     self.number_inputs = 0
 
                 def add(self, name_input: str, value: float, weight: float):
-                    # print(f"{name_input}, {value}, {weight}")
                     self.inputs.update({name_input: (value, weight)})
-                    # print(self.inputs)
                     self.number_inputs += 1
 
-                def get(self, name_input: str) -> dict:
-                    return self.inputs[name_input]
+                def get(self, name_input: str) -> float | None:
+                    if name_input in self.inputs.keys():
+                        return self.inputs[name_input]
+                    return None
 
         def add_neuron(self) -> Neuron:
             neuron = self.Neuron(self.name + str(len(self.neurons)))

@@ -3,11 +3,12 @@ from Draw import Draw
 
 import math
 
+
 class Neural_network:
     def __init__(self):
-        self.input_layer = self.Layer("input")
+        self.input_layer = self.Layer("X")
         self.hidden_layers = []
-        self.output_layer = self.Layer("output")
+        self.output_layer = self.Layer("Y")
 
     class Layer:
         def __init__(self, name: str):
@@ -65,15 +66,15 @@ class Neural_network:
                 def get(self, name_input: str) -> dict:
                     return self.inputs[name_input]
 
-        def add_neuron(self, name) -> Neuron:
-            neuron = self.Neuron(name)
+        def add_neuron(self) -> Neuron:
+            neuron = self.Neuron(self.name + str(len(self.neurons)))
             self.neurons.append(neuron)
             return neuron
 
-    def add_hidden_layer(self, name):
+    def add_hidden_layer(self, name: str):
         self.hidden_layers.append(self.Layer(name))
 
-    def get_hidden_layer(self, name) -> Layer:
+    def get_hidden_layer(self, name: str) -> Layer:
         layer = None
         for hidden_layer in self.hidden_layers:
             if hidden_layer.name == name:
@@ -90,31 +91,17 @@ class Neural_network:
             print(f"Hidden Layer: {hidden_layer.name}")
             for k, neuron in enumerate(hidden_layer.neurons):
                 print(
-                    f"{'|' if k < len(hidden_layer.neurons) - 1 else chr(92)}->Name: {neuron.name}; Sigma: {neuron.sigma}")
+                    f"{'|' if k < len(hidden_layer.neurons) - 1 else chr(92)}->Name: {neuron.name}; Inputs: "
+                    f"{(str([k for k, input_ in neuron.input.inputs.items() if k != 'bias']).replace('[', '(').replace(']', ')'))}"
+                    f"; Sigma: {neuron.sigma}")
         print("\n")
         print(f"Output Layer:")
         for k, neuron in enumerate(self.output_layer.neurons):
             print(
-                f"{'|' if k < len(self.output_layer.neurons) - 1 else chr(92)}->Name: {neuron.name}; Sigma: {neuron.sigma}")
+                f"{'|' if k < len(self.output_layer.neurons) - 1 else chr(92)}->Name: {neuron.name}; Inputs: "
+                f"{(str([k for k, input_ in neuron.input.inputs.items() if k != 'bias']).replace('[', '(').replace(']', ')'))}"
+                f"; Sigma: {neuron.sigma}")
 
     def show_network(self):
         draw = Draw(self)
         draw.go()
-        '''
-        print("Input layer:")
-        for k, neuron in enumerate(self.input_layer.neurons):
-
-        print("\n")
-        for hidden_layer in self.hidden_layers:
-            print(f"Hidden Layer: {hidden_layer.name}")
-            for k, neuron in enumerate(hidden_layer.neurons):
-                print(
-                    f"{'|' if k < len(hidden_layer.neurons) - 1 else chr(92)}->Name: {neuron.name}; Sigma: {neuron.sigma}")
-        print("\n")
-        print(f"Output Layer:")
-        for k, neuron in enumerate(self.output_layer.neurons):
-            print(
-                f"{'|' if k < len(self.output_layer.neurons) - 1 else chr(92)}->Name: {neuron.name}; Sigma: {neuron.sigma}")
-        m_canvas.set_scrollregion(*m_canvas.get_more_distant_points())
-        root.mainloop()
-        '''

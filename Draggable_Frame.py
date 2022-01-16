@@ -1,3 +1,5 @@
+#  Copyright ~Lorenzo Londero 2021.
+
 import math
 import tkinter as tk
 from pygame.math import Vector2
@@ -98,7 +100,7 @@ class Canvas(tk.Canvas):
         if show_intersections:
             for coords in line_coord_of_collisions:
                 # print(coords)
-                self.draw_circle(*coords, 5, consider=False)
+                self.draw_circle(*coords, 5, consider=False, outline='red')
 
         def adder(list_obj: tuple, value_: float) -> tuple:
             diff = ()

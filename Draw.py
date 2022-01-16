@@ -1,3 +1,5 @@
+#  Copyright ~Lorenzo Londero 2021.
+
 from __future__ import annotations
 import math
 import random
@@ -11,7 +13,7 @@ class Draw:
     def __init__(self, neural_network: Neural_Network, width=800, height=500):
         self.root = tk.Tk()
         self.root.geometry(f"{width}x{height}")
-        self.root.resizable(True, False)
+        self.root.resizable(True, True)
         self.draggable_frame = Draggable_frame(self.root)
         self.draggable_frame.pack(fill="both", expand=True)
         self.neural_network = neural_network
@@ -61,12 +63,13 @@ class Draw:
                 self.y_pointer = 75
                 self.y_last_pointer = 0
 
-            def draw_neuron(self, neuron: Neuron):
+            def draw_neuron(self, neuron: Neural_Network.Neural_network.Layer.Neuron):
                 x0 = self._x_pointer
                 y0 = self.y_pointer
                 y1 = y0 + self.radius
                 neuron_drew = self.draggable_frame.canvas.draw_circle(x0, y0, self.radius, outline="black",
                                                                       fill=self.neuron_colors)
+                neuron.circle_id = neuron_drew
                 neuron_name = self.draggable_frame.canvas.create_text(x0, y0 - 5,
                                                                       text=neuron.name,
                                                                       font=("Purisa", 11))
@@ -111,15 +114,10 @@ class Draw:
                     neuron_coords = (self.draggable_frame.canvas.bbox(neuron_info[0])[0] + self.radius,
                                      self.draggable_frame.canvas.bbox(neuron_info[0])[1] + self.radius)
                     for neuron_connected in neuron_info[1].neurons_connected:
-                        neuron_connected_ = ()
-                        weight_value = 0
-                        for next_layer in self.layers[k + 1:]:
-                            for next_neuron in next_layer.neurons.items():
-                                if neuron_connected.name == next_neuron[1].name:
-                                    weight_value = neuron_connected.input.get(neuron_info[1].name)[1]
-                                    neuron_connected_ += (
-                                        self.draggable_frame.canvas.bbox(next_neuron[0])[0] + self.radius,
-                                        self.draggable_frame.canvas.bbox(next_neuron[0])[1] + self.radius)
+                        weight_value = neuron_connected.input.get_all()[neuron_info[1]][1]
+                        neuron_connected_ = (
+                            self.draggable_frame.canvas.bbox(neuron_connected.circle_id)[0] + self.radius,
+                            self.draggable_frame.canvas.bbox(neuron_connected.circle_id)[1] + self.radius)
                         deltaY = (neuron_coords[1] - neuron_connected_[1])
                         deltaX = (neuron_connected_[0] - neuron_coords[0])
                         angle = (math.atan2(deltaY, deltaX))
@@ -135,22 +133,18 @@ class Draw:
                     neuron_coords = (self.draggable_frame.canvas.bbox(neuron_info[0])[0] + self.radius,
                                      self.draggable_frame.canvas.bbox(neuron_info[0])[1] + self.radius)
                     for neuron_connected in neuron_info[1].neurons_connected:
-                        neuron_connected_ = ()
-                        for next_layer in self.layers[k + 1:]:
-                            for next_neuron in next_layer.neurons.items():
-                                if neuron_connected.name == next_neuron[1].name:
-                                    neuron_connected_ += (
-                                        self.draggable_frame.canvas.bbox(next_neuron[0])[0] + self.radius,
-                                        self.draggable_frame.canvas.bbox(next_neuron[0])[1] + self.radius)
+                        neuron_connected_ = (
+                            self.draggable_frame.canvas.bbox(neuron_connected.circle_id)[0] + self.radius,
+                            self.draggable_frame.canvas.bbox(neuron_connected.circle_id)[1] + self.radius)
                         line_xa = neuron_coords[0]
                         line_ya = neuron_coords[1]
+                        deltaY = -(neuron_coords[1] - neuron_connected_[1])
+                        deltaX = (neuron_connected_[0] - neuron_coords[0])
                         angle = (math.atan2(deltaY, deltaX))
-                        xy = self.draggable_frame.canvas.bbox(neuron_info[0])
-                        x = xy[2] - xy[0] + 1
-                        x_offset = ((x / 2) * math.cos(angle))
-                        y_offset = ((x / 2) * math.sin(angle))
+                        x_offset = ((self.radius + 2) * math.cos(angle))
+                        y_offset = ((self.radius + 2) * math.sin(angle))
                         line_xb = neuron_connected_[0] - x_offset
-                        line_yb = neuron_connected_[1] + y_offset
+                        line_yb = neuron_connected_[1] - y_offset
                         self.draggable_frame.canvas.draw_line(line_xa, line_ya, line_xb, line_yb,
                                                               arrow=tk.LAST, offset_collision=5,
                                                               show_intersections=False)
@@ -183,7 +177,7 @@ class Draw:
             a = (min_x, min_y, max_x, max_y)
             frame.canvas.create_rectangle(*a)
             for k, layer in enumerate(self.layers):
-                layer.write_name_layer(layer.x_pointer, min_y - delta_y)
+                layer.write_name_layer(layer.x_pointer, min_y + 25)
             for object_id in frame.canvas.find_all():
                 frame.canvas.move(object_id, - min_x + delta_x / 2, - min_y + delta_y / 2)
 
